@@ -33,7 +33,7 @@ jobs:
       - name: Generate image tag
         id: vars
         run: |
-          TAG=$(git rev-parse --short HEAD)
+          TAG=$(cat VERSION.txt)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       # Step 5: Build and push Docker image
@@ -43,6 +43,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:${{ steps.vars.outputs.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:latest
           build-args: |
             APP_VERSION=${{ steps.vars.outputs.tag }}
