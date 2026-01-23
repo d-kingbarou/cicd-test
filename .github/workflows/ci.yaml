@@ -1,0 +1,48 @@
+name: Build & Push Docker Image
+
+# Trigger workflow on pushes to main branch
+on:
+  push:
+    branches:
+     - main
+
+env:
+  IMAGE_NAME: demo-app
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx (advanced builder)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Step 4: Generate a unique image tag from git commit
+      - name: Generate image tag
+        id: vars
+        run: |
+          TAG=$(git rev-parse --short HEAD)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      # Step 5: Build and push Docker image
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:${{ steps.vars.outputs.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:latest
+          build-args: |
+            APP_VERSION=${{ steps.vars.outputs.tag }}
