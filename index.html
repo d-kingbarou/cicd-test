@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo App</title>
+</head>
+<body>
+  <h1>Hello World 🚀</h1>
+  <p>Version: <span id="version"></span></p>
+
+  <script>
+    fetch('/version')
+      .then(res => res.text())
+      .then(v => document.getElementById('version').innerText = v);
+  </script>
+</body>
+</html>
